@@ -18,7 +18,7 @@ class BookingController extends Controller
             exit;
         }
     }
-
+ 
     public function index()
     {
         $this->requireLogin();
@@ -39,45 +39,59 @@ class BookingController extends Controller
     }
 
     public function create()
-    {
-        $this->requireLogin();
+{
+    $this->requireLogin();
 
-        if ($this->io->method() === 'post') {
+    if ($this->io->method() === 'post') {
 
-            $payment_image = null;
+        $payment_image = null;
 
-if (!empty($_FILES['payment_image']['name'])) {
-    $upload_dir = $_SERVER['DOCUMENT_ROOT'] . 'public/uploads/payments/';
-    if (!is_dir($upload_dir)) {
-        mkdir($upload_dir, 0755, true);
-    }
+        if (!empty($_FILES['payment_image']['name'])) {
+            // Set the upload directory (ensure this folder exists on your server)
+            $upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/public/uploads/payments/';
 
-    $filename = uniqid() . '_' . basename($_FILES['payment_image']['name']);
-    $target_file = $upload_dir . $filename;
+            // Check if the directory exists
+            if (!is_dir($upload_dir)) {
+                // Stop execution if folder does not exist
+                echo "Upload folder does not exist. Please create: " . $upload_dir;
+                return;
+            }
 
-    if (move_uploaded_file($_FILES['payment_image']['tmp_name'], $target_file)) {
-        $payment_image = $filename;
-    }
-}
+            // Generate a unique filename
+            $filename = uniqid() . '_' . basename($_FILES['payment_image']['name']);
+            $target_file = $upload_dir . $filename;
 
-
-            $data = [
-                'user_id'        => $_SESSION['user_id'],
-                'type'           => $this->io->post('type'),
-                'date'           => $this->io->post('date'),
-                'time'           => $this->io->post('time'),
-                'service'        => $this->io->post('service') ?: 'Check-in',
-                'status'         => 'pending',
-                'payment_image'  => $payment_image,
-                'payment_status' => 'unverified'
-            ];
-
-            $this->BookingModel->insert($data);
-            redirect('lushcamp/bookings');
+            // Move the uploaded file
+            if (move_uploaded_file($_FILES['payment_image']['tmp_name'], $target_file)) {
+                $payment_image = $filename;
+            } else {
+                echo "Failed to upload the file. Check folder permissions.";
+                return;
+            }
         }
 
-        $this->call->view('lushcamp/create_new');
+        // Prepare data for insertion
+        $data = [
+            'user_id'        => $_SESSION['user_id'],
+            'type'           => $this->io->post('type'),
+            'date'           => $this->io->post('date'),
+            'time'           => $this->io->post('time'),
+            'service'        => $this->io->post('service') ?: 'Check-in',
+            'status'         => 'pending',
+            'payment_image'  => $payment_image,
+            'payment_status' => 'unverified'
+        ];
+
+        // Insert booking
+        $this->BookingModel->insert($data);
+
+        // Redirect to bookings page
+        redirect('lushcamp/bookings');
     }
+
+    // Load the create view
+    $this->call->view('lushcamp/create_new');
+}
 
     public function update($id)
     {
