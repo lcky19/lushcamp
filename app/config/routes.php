@@ -42,9 +42,9 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 |
 |
 */
-// User Auth
 
-// Auth
+
+
 // AUTH
 $router->match('/lushcamp/login', 'UserController::login', ['GET','POST']);
 $router->match('/lushcamp/register', 'UserController::register', ['GET','POST']);

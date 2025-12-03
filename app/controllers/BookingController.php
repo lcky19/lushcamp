@@ -47,21 +47,21 @@ class BookingController extends Controller
         $payment_image = null;
 
         if (!empty($_FILES['payment_image']['name'])) {
-            // Set the upload directory (ensure this folder exists on your server)
+            
             $upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/public/uploads/payments/';
 
-            // Check if the directory exists
+           
             if (!is_dir($upload_dir)) {
-                // Stop execution if folder does not exist
+               
                 echo "Upload folder does not exist. Please create: " . $upload_dir;
                 return;
             }
 
-            // Generate a unique filename
+           
             $filename = uniqid() . '_' . basename($_FILES['payment_image']['name']);
             $target_file = $upload_dir . $filename;
 
-            // Move the uploaded file
+           
             if (move_uploaded_file($_FILES['payment_image']['tmp_name'], $target_file)) {
                 $payment_image = $filename;
             } else {
@@ -70,7 +70,7 @@ class BookingController extends Controller
             }
         }
 
-        // Prepare data for insertion
+   
         $data = [
             'user_id'        => $_SESSION['user_id'],
             'type'           => $this->io->post('type'),
@@ -82,14 +82,14 @@ class BookingController extends Controller
             'payment_status' => 'unverified'
         ];
 
-        // Insert booking
+        
         $this->BookingModel->insert($data);
 
-        // Redirect to bookings page
+       
         redirect('lushcamp/bookings');
     }
 
-    // Load the create view
+    
     $this->call->view('lushcamp/create_new');
 }
 
